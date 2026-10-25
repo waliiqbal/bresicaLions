@@ -14,7 +14,7 @@ Frontend and backend both live in this single Next.js project. There is NO separ
 ## Stack
 - Next.js 16 (App Router, `src/` dir), React 19, TypeScript (strict)
 - Tailwind CSS v4 via `@tailwindcss/postcss` (`postcss.config.mjs`). Do NOT use `@tailwindcss/turbopack`.
-- `next.config.ts` is kept default. Do NOT enable `cacheComponents` / `partialPrefetching` unless the user asks.
+- The config is `next.config.mjs` (plain JS, NOT .ts) and `npm run build` is `next build --webpack`: the Hostinger server (brescialionst10.com) has an old glibc, so the native SWC binary cannot load, Turbopack is unavailable and a `next.config.ts` could not be compiled there. Keep it that way. Do NOT enable `cacheComponents` / `partialPrefetching` unless the user asks.
 - MongoDB with Mongoose
 - Zod for validation
 - Cloudinary for images (confirmed; MongoDB stores only URLs)
@@ -199,6 +199,7 @@ Phase 9 notes:
 - Demo seed now also loads 5 sponsors, 15 players, 7 coaches (all flagged `isDemo`, so "Remove demo content" deletes them) and makes sure the Lions team exists. `src/data/matches.ts` was deleted (no sample fixtures any more); `src/data/{about,players,sponsors}.ts` are still needed by the seed until Phase 10.
 - Empty states handled: no players hides the home squad slider and `/squad` says "The squad will be announced soon."; no staff hides the Coaching Staff block on `/about`; no sponsors hides the sponsors row.
 - `app/admin/(panel)/layout.tsx` has `export const dynamic = "force-dynamic"` on purpose: without it `next build` also ran the admin page bodies (in parallel with the login check) and `ensureLionsTeam()` wrote a Lions row into the database during the build. Keep it, and never put database WRITES in code that public/static pages call.
+- Hosting reality: the club site is deployed on Hostinger (Node 24, build = `npm run build`, env vars from the host's `.env`). `withAdmin` has a default context type `{ params: Promise<object> }` so `next build --webpack` type checks the route handlers.
 - Testing gotcha: with `NEXT_DIST_DIR=.next-test`, `next dev` rewrites `.next-test/dev/logs` on every request and its own watcher treats that as a code change, so a real browser page reloads in an endless loop (HMR "Fast Refresh rebuilding"). This is a test-setup artifact, not an app bug. For browser tests build with `NEXT_DIST_DIR=.next-test next build` and run `next start -p 3100` (production mode); `MAIL_MODE=console` only works in dev, so create the test admin with a dev server first (or API tests) and reuse it.
 
 Phase 7 notes:

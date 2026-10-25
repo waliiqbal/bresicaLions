@@ -64,7 +64,9 @@ type AdminHandler<C> = (
  * Wraps a route handler so only the logged-in admin can call it. Every
  * mutating admin route must use this; proxy.ts alone is not enough.
  */
-export function withAdmin<C = object>(handler: AdminHandler<C>) {
+// Routes without a dynamic segment still receive `{ params }` from Next.js; the
+// default says so, which keeps the type check of `next build --webpack` happy.
+export function withAdmin<C = { params: Promise<object> }>(handler: AdminHandler<C>) {
   return async (req: NextRequest, ctx: C): Promise<Response> => {
     if (req.method !== "GET" && !isSameOrigin(req)) {
       return apiError("forbidden", "Cross-site request blocked.", 403);

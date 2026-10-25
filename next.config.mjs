@@ -1,5 +1,3 @@
-import type { NextConfig } from "next";
-
 const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 
 // Basic browser protections for every page. (No strict Content-Security-Policy:
@@ -12,7 +10,8 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
 ];
 
-const nextConfig: NextConfig = {
+/** @type {import("next").NextConfig} */
+const nextConfig = {
   poweredByHeader: false,
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
