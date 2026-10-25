@@ -4,21 +4,20 @@ import { ContactForm } from "@/components/site/ContactForm";
 import { PageHeader } from "@/components/site/PageHeader";
 import { Section } from "@/components/site/Section";
 import { SocialIcon } from "@/components/site/SocialIcon";
-import { siteConfig } from "@/lib/site";
+import { getSiteSettings } from "@/modules/settings/settings.service";
 
 export const metadata: Metadata = {
   title: "Contact",
   description: "Get in touch with the Brescia Lions.",
 };
 
-const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(
-  siteConfig.contact.address,
-)}&output=embed`;
+export default async function ContactPage() {
+  const { contact, socials } = await getSiteSettings();
+  const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(
+    contact.address,
+  )}&output=embed`;
 
-export default function ContactPage() {
-  const { contact, socials } = siteConfig;
-
-  const details = [
+  const details: { icon: string; label: string; value: string; href?: string }[] = [
     { icon: "📍", label: "Address", value: contact.address },
     {
       icon: "✉️",
@@ -27,6 +26,14 @@ export default function ContactPage() {
       href: `mailto:${contact.email}`,
     },
   ];
+  if (contact.phone) {
+    details.push({
+      icon: "📞",
+      label: "Phone",
+      value: contact.phone,
+      href: `tel:${contact.phone.replace(/[^+\d]/g, "")}`,
+    });
+  }
 
   return (
     <>
@@ -76,7 +83,7 @@ export default function ContactPage() {
                 ))}
               </ul>
 
-              <div className="mt-6 flex gap-2 border-t border-gold/20 pt-5">
+              <div className="mt-6 flex flex-wrap gap-2 border-t border-gold/20 pt-5">
                 {socials.map((s) => (
                   <a
                     key={s.label}

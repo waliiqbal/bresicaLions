@@ -9,7 +9,7 @@ import { Section } from "@/components/site/Section";
 import { StaffCard } from "@/components/site/StaffCard";
 import { StatsList } from "@/components/site/StatsList";
 import { getAbout } from "@/modules/about/about.service";
-import { getSupportStaff } from "@/modules/players/player.service";
+import { getSupportStaff } from "@/modules/staff/staff.service";
 import { HASHTAG_SRC, siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -190,19 +190,23 @@ export default async function AboutPage() {
       </Section>
 
       <Section>
-        <SectionHeading
-          white="Coaching"
-          gold="Staff"
-          subtitle="The team behind the team"
-        />
-        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {coaching.map((member) => (
-            <li key={member.id}>
-              <StaffCard member={member} href={`/squad/staff/${member.slug}`} />
-            </li>
-          ))}
-        </ul>
-        <div className="mt-12 text-center">
+        {coaching.length > 0 && (
+          <>
+            <SectionHeading
+              white="Coaching"
+              gold="Staff"
+              subtitle="The team behind the team"
+            />
+            <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {coaching.map((member) => (
+                <li key={member.id}>
+                  <StaffCard member={member} href={`/squad/staff/${member.slug}`} />
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+        <div className={coaching.length > 0 ? "mt-12 text-center" : "text-center"}>
           <ButtonLink href="/squad">Meet The Squad</ButtonLink>
         </div>
       </Section>

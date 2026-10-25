@@ -21,6 +21,8 @@ type ImageDropzoneProps = {
   onChange: (value: UploadedImage | null) => void;
   label?: string;
   hint?: string;
+  /** Best size to upload, shown in a highlighted line, e.g. "1600 x 900 px (wide)". */
+  size?: string;
   className?: string;
   /**
    * Cloudinary id of the image already saved in the database. Removing that
@@ -35,7 +37,8 @@ export function ImageDropzone({
   value,
   onChange,
   label = "Image",
-  hint = "JPG, PNG or WEBP. Large photos are resized automatically.",
+  hint = "JPG, PNG or WEBP, up to 4 MB. Bigger photos are shrunk automatically.",
+  size,
   className,
   persistedPublicId,
 }: ImageDropzoneProps) {
@@ -96,6 +99,11 @@ export function ImageDropzone({
       <p className="mb-2 text-xs font-bold uppercase tracking-wider text-ink/70">
         {label}
       </p>
+      {size && (
+        <p className="mb-3 rounded-lg bg-gold/20 px-3 py-2 text-xs font-semibold text-green-dark">
+          Best size: {size}
+        </p>
+      )}
 
       {value ? (
         <div className="overflow-hidden rounded-xl border border-green-dark/20 bg-white">

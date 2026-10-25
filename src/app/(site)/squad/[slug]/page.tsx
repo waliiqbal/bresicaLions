@@ -61,7 +61,7 @@ export default async function PlayerPage({
         </ButtonLink>
 
         <div className="grid gap-10 md:grid-cols-[20rem_1fr] lg:grid-cols-[24rem_1fr] lg:gap-14">
-          <div className="relative mx-auto aspect-[3/4] w-full max-w-sm overflow-hidden rounded-xl border border-gold/40 bg-linear-to-br from-green-card to-green-deep shadow-card md:mx-0 md:max-w-none">
+          <div className="relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden rounded-xl border border-gold/40 bg-linear-to-br from-green-card to-green-deep shadow-card md:mx-0 md:max-w-none">
             {player.image && (
               <Image
                 src={player.image}

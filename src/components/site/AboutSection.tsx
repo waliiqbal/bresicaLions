@@ -1,10 +1,10 @@
 import Image from "next/image";
-import type { About } from "@/modules/about/about.types";
+import type { AboutContent } from "@/modules/about/about.types";
 import { ButtonLink } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { StatsList } from "./StatsList";
 
-export function AboutSection({ about }: { about: About }) {
+export function AboutSection({ about }: { about: AboutContent }) {
   const [white, ...rest] = about.heading.split(" ");
   const gold = rest.pop() ?? "";
   const lead = [white, ...rest].join(" ");

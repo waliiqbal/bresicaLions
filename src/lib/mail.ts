@@ -3,6 +3,8 @@ import nodemailer, { type Transporter } from "nodemailer";
 interface MailMessage {
   to: string;
   subject: string;
+  /** Where a reply goes (the visitor's address for contact messages). */
+  replyTo?: string;
   text: string;
   html: string;
 }

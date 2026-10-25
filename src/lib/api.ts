@@ -17,6 +17,12 @@ export function apiError(
   );
 }
 
+/** The visitor's address as seen by the host (used only for rate limiting). */
+export function clientIp(req: NextRequest) {
+  const forwarded = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  return forwarded || req.headers.get("x-real-ip") || "unknown";
+}
+
 /**
  * Blocks cross-site form posts. Browsers always send Origin on POST, so a
  * mismatch means the request came from another site.
@@ -96,8 +102,12 @@ export function authFailure(result: {
 
 const SERVICE_STATUS: Record<string, number> = {
   not_found: 404,
+  not_allowed: 403,
   slug_taken: 409,
+  name_taken: 409,
+  in_use: 409,
   needs_image: 422,
+  invalid: 422,
 };
 
 /** Turns a failed service result (not_found, slug_taken...) into a response. */

@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+// Admin pages are always rendered per request. Without this, `next build`
+// also runs the page bodies (in parallel with the login check) and a page that
+// creates the Lions team would write to the database during the build.
+export const dynamic = "force-dynamic";
+
 export default async function AdminPanelLayout({
   children,
 }: LayoutProps<"/admin">) {

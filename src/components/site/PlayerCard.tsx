@@ -18,7 +18,7 @@ export function PlayerCard({
   return (
     <Link href={`/squad/${player.slug}`} className={cn("group block", className)}>
       <Card className="overflow-hidden">
-        <div className="relative aspect-[3/4] bg-linear-to-br from-green-card to-green-deep">
+        <div className="relative aspect-[4/5] bg-linear-to-br from-green-card to-green-deep">
           {player.image && (
             <Image
               src={player.image}

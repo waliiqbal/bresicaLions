@@ -154,7 +154,11 @@ export function ArticleForm({ article }: { article?: Article }) {
           </Panel>
 
           <Panel>
-            <Field label="Story" error={firstError("content")}>
+            <Field
+              label="Story"
+              error={firstError("content")}
+              hint="Pictures added inside the story with the Image button: 1200 px wide or more, any shape. They fill the width of the story."
+            >
               <RichTextEditor value={content} onChange={setContent} />
             </Field>
           </Panel>
@@ -165,7 +169,8 @@ export function ArticleForm({ article }: { article?: Article }) {
             <ImageDropzone
               folder="news"
               label="Cover image"
-              hint="Landscape photo, JPG/PNG/WEBP."
+              size="1600 × 900 px (16:9 wide)"
+              hint="Used on the news cards, the story page and when the link is shared. A tall poster still works but shows blurred bars on the sides."
               value={image}
               onChange={(value) => {
                 setImage(value);

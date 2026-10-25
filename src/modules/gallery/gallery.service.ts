@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { albums } from "@/data/gallery";
+// import { albums } from "@/data/gallery"; // only used by the old static version below
 import { connectDB } from "@/lib/db";
 import { removeStoredImage } from "@/lib/images";
 import { uniqueSlug } from "@/lib/slug";
@@ -30,17 +30,17 @@ export function toAlbum(doc: AlbumDoc): Album {
 }
 
 // ------------------------------------------------------------ public site
-// The public gallery is static for now: it reads the albums in
-// `src/data/gallery.ts` (photos in `public/images/sample/`), not MongoDB.
-// The admin functions below still use the database.
-
-const staticAlbums: Album[] = [...albums]
-  .map((album) => ({ ...album, isDemo: false }))
-  .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+// ------------------------------------------------------------ public site
+// The public gallery reads the albums saved in MongoDB (added in the admin panel).
+// Albums without photos are hidden.
 
 /** Albums that have at least one photo, newest first. */
 export async function getAlbums() {
-  return staticAlbums.filter((album) => album.photos.length > 0);
+  await connectDB();
+  const docs = await AlbumModel.find({ "photos.0": { $exists: true } })
+    .sort({ createdAt: -1 })
+    .lean<AlbumDoc[]>();
+  return docs.map(toAlbum);
 }
 
 /**
@@ -64,12 +64,56 @@ export async function getLatestGalleryItems(limit = 5): Promise<GalleryItem[]> {
 }
 
 export async function getAlbumBySlug(slug: string) {
-  return (await getAlbums()).find((album) => album.slug === slug) ?? null;
+  await connectDB();
+  const doc = await AlbumModel.findOne({ slug, "photos.0": { $exists: true } }).lean<AlbumDoc>();
+  return doc ? toAlbum(doc) : null;
 }
 
 export async function getAlbumSlugs() {
   return (await getAlbums()).map((album) => album.slug);
 }
+
+// ---- Old static version (sample photos from src/data/gallery.ts), kept for reference:
+// // The public gallery is static for now: it reads the albums in
+// // `src/data/gallery.ts` (photos in `public/images/sample/`), not MongoDB.
+// // The admin functions below still use the database.
+//
+// const staticAlbums: Album[] = [...albums]
+//   .map((album) => ({ ...album, isDemo: false }))
+//   .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+//
+// /** Albums that have at least one photo, newest first. */
+// export async function getAlbums() {
+//   return staticAlbums.filter((album) => album.photos.length > 0);
+// }
+//
+// /**
+//  * Photos for the home page gallery: the cover of each of the newest albums,
+//  * then, if there are fewer albums than `limit`, more photos from those albums.
+//  */
+// export async function getLatestGalleryItems(limit = 5): Promise<GalleryItem[]> {
+//   const albums = await getAlbums();
+//   const items: GalleryItem[] = [];
+//   for (let round = 0; items.length < limit; round++) {
+//     const before = items.length;
+//     for (const album of albums) {
+//       const photo = album.photos[round];
+//       if (photo && items.length < limit) {
+//         items.push({ ...photo, albumTitle: album.title, albumSlug: album.slug });
+//       }
+//     }
+//     if (items.length === before) break;
+//   }
+//   return items;
+// }
+//
+// export async function getAlbumBySlug(slug: string) {
+//   return (await getAlbums()).find((album) => album.slug === slug) ?? null;
+// }
+//
+// export async function getAlbumSlugs() {
+//   return (await getAlbums()).map((album) => album.slug);
+// }
 
 // ------------------------------------------------------------ admin panel
 

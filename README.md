@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Brescia Lions — website and admin panel
 
-## Getting Started
+Public website for fans plus a private admin panel for the club team. Built with
+Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, MongoDB (Mongoose),
+Zod, Cloudinary and nodemailer. Frontend and backend live in this one project.
 
-First, run the development server:
+## Run it on your computer
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Install Node.js 20 or newer.
+2. `npm install`
+3. Copy `.env.example` to `.env.local` and fill in the values (see below).
+4. `npm run dev` and open http://localhost:3000
+5. First time only: open http://localhost:3000/admin/setup, type your email and a password,
+   enter the 6-digit code that arrives by email, then log in at `/admin/login`.
+6. On the Dashboard click **Load demo content** to fill the site with samples
+   (and **Remove demo content** when you are ready for the real content).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Useful commands: `npm run build` (production build), `npm run lint`, `npx tsc --noEmit`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+See `.env.example` for every name with a short explanation. Secrets live only in `.env.local`
+(never committed) and on the hosting provider.
 
-## Learn More
+## Put the website live (Vercel)
 
-To learn more about Next.js, take a look at the following resources:
+1. Push the project to GitHub and import it in Vercel (framework: Next.js, defaults are fine).
+2. In Vercel > Project > Settings > Environment Variables add every variable from
+   `.env.example` for **Production**. Important ones:
+   - `MONGODB_URI`: in MongoDB Atlas > Network Access allow Vercel (`0.0.0.0/0`).
+   - `JWT_SECRET`: a new random text of 64+ characters (do not reuse the local one).
+   - `ADMIN_EMAIL`: the one email allowed to create the admin account.
+   - `NEXT_PUBLIC_SITE_URL`: the real address, for example `https://www.brescialions.it`.
+   - `CLOUDINARY_*` and `EMAIL_*`.
+   - Do **not** set `MAIL_MODE`.
+3. Deploy. Then immediately open `https://your-site/admin/setup` and create the admin account
+   (until it exists, the `ADMIN_EMAIL` lock is what protects the setup page).
+4. Log in, open **Settings** and check the club email, phone, address and social links.
+5. Add the real content (News, Banners, Squad, Matches, Sponsors, About Us, Gallery).
+   Use **Remove demo content** on the Dashboard to delete the sample content.
+6. Launch day: set `ALLOW_INDEXING=true` in Vercel and redeploy so Google may list the site.
+   Until then the site tells search engines to stay away.
+7. Connect your own domain in Vercel > Domains (https is automatic).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Before and after launch checklist
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- [ ] Admin account created with a strong password, `ADMIN_EMAIL` set.
+- [ ] Dashboard > System status: Database, Email, Image storage and Website address are all green.
+- [ ] Send a test message from the Contact page: it must appear under Messages and arrive by email.
+- [ ] Privacy Policy and Terms (`/privacy`, `/terms`) reviewed by the club (they are a general template).
+- [ ] Demo content removed, real photos and text added.
+- [ ] `ALLOW_INDEXING=true` set and site redeployed on launch day.
+- [ ] Regularly download the subscriber list (Subscribers > Download CSV) and keep a MongoDB Atlas backup.
 
-## Deploy on Vercel
+## Project layout
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/app/(site)` public pages, `src/app/admin` admin panel, `src/app/api` REST routes (controllers).
+- `src/modules/<feature>` schema, DTO (Zod) and service (all database queries) for each feature.
+- `src/components`, `src/lib` shared UI and helpers, `src/proxy.ts` first gate for `/admin`.
+- `CLAUDE.md` holds the detailed project notes and decisions.

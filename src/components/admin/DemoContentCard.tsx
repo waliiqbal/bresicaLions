@@ -7,7 +7,30 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { sendJson } from "@/lib/client-api";
 import { Notice, Panel } from "./ui";
 
-type Counts = { articles: number; banners: number; albums: number };
+type Counts = {
+  articles: number;
+  banners: number;
+  albums: number;
+  sponsors: number;
+  players: number;
+  staff: number;
+};
+
+const labels: [keyof Counts, string][] = [
+  ["articles", "stories"],
+  ["banners", "banners"],
+  ["albums", "albums"],
+  ["sponsors", "sponsors"],
+  ["players", "players"],
+  ["staff", "coaches"],
+];
+
+/** "3 stories, 2 banners" - sections with nothing are left out. */
+const describe = (counts: Counts) =>
+  labels
+    .filter(([key]) => counts[key] > 0)
+    .map(([key, label]) => `${counts[key]} ${label}`)
+    .join(", ") || "nothing";
 
 export function DemoContentCard({
   demo,
@@ -22,7 +45,7 @@ export function DemoContentCard({
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const hasDemo = demo.articles + demo.banners + demo.albums > 0;
+  const hasDemo = labels.some(([key]) => demo[key] > 0);
 
   async function run(action: "load" | "remove") {
     setBusy(action);
@@ -37,11 +60,7 @@ export function DemoContentCard({
       return;
     }
     const r = result.data.result;
-    setMessage(
-      action === "load"
-        ? `Added ${r.articles} stories, ${r.banners} banners and ${r.albums} albums.`
-        : `Removed ${r.articles} stories, ${r.banners} banners and ${r.albums} albums.`,
-    );
+    setMessage(`${action === "load" ? "Added" : "Removed"}: ${describe(r)}.`);
     router.refresh();
   }
 
@@ -49,8 +68,9 @@ export function DemoContentCard({
     <Panel>
       <h2 className="font-heading text-xl font-bold text-green-dark">Demo content</h2>
       <p className="mt-1 text-sm text-ink/60">
-        Sample stories, banners and albums so the website looks complete while you
-        get started. Removing demo content never touches anything you wrote.
+        Sample stories, banners, albums, players, coaches and sponsors so the website
+        looks complete while you get started. Removing demo content never touches
+        anything you wrote.
       </p>
 
       {message && <div className="mt-4"><Notice>{message}</Notice></div>}
@@ -58,7 +78,7 @@ export function DemoContentCard({
 
       <p className="mt-4 text-sm text-ink/70">
         {hasDemo
-          ? `Currently on the site: ${demo.articles} stories, ${demo.banners} banners, ${demo.albums} albums.`
+          ? `Currently on the site: ${describe(demo)}.`
           : "No demo content is on the site."}
       </p>
 
@@ -92,7 +112,7 @@ export function DemoContentCard({
         onConfirm={() => run("remove")}
         loading={busy === "remove"}
         title="Remove all demo content?"
-        message="Only the sample stories, banners and albums are deleted. Content you added yourself stays."
+        message="Only the sample content is deleted. Content you added yourself stays."
         confirmLabel="Remove"
       />
     </Panel>

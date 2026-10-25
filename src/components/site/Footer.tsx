@@ -3,19 +3,20 @@ import Link from "next/link";
 import { HASHTAG_SRC, PARTNER_LOGO_SRC, navLinks, siteConfig } from "@/lib/site";
 import { Logo } from "./Logo";
 import { SocialIcon } from "./SocialIcon";
+import { getSiteSettings } from "@/modules/settings/settings.service";
 import { SubscribeForm } from "./SubscribeForm";
 
 const quickLinks = navLinks.filter((l) => l.href !== "/");
 
-export function Footer() {
-  const { contact, socials } = siteConfig;
+export async function Footer() {
+  const { contact, socials, footerText } = await getSiteSettings();
 
   return (
     <footer className="mt-auto border-t-2 border-gold bg-black/40">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
         <div>
           <Logo size={110} />
-          <p className="mt-4 text-sm text-cream/80">{siteConfig.tagline}.</p>
+          <p className="mt-4 text-sm text-cream/80">{footerText}</p>
           <Image
             src={HASHTAG_SRC}
             alt={siteConfig.hashtag}
@@ -51,6 +52,13 @@ export function Footer() {
                 {contact.email}
               </a>
             </li>
+            {contact.phone && (
+              <li>
+                <a href={`tel:${contact.phone.replace(/[^+\d]/g, "")}`} className="hover:text-gold-light">
+                  {contact.phone}
+                </a>
+              </li>
+            )}
           </ul>
         </div>
 
@@ -58,7 +66,7 @@ export function Footer() {
           <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-gold">
             Follow the Lions
           </h3>
-          <div className="mb-6 flex gap-2">
+          <div className="mb-6 flex flex-wrap gap-2">
             {socials.map((s) => (
               <a
                 key={s.label}
@@ -86,7 +94,15 @@ export function Footer() {
               © {new Date().getFullYear()} {siteConfig.name}. All rights
               reserved.
             </p>
-            <p>Privacy Policy · Terms</p>
+            <p className="flex gap-3">
+              <Link href="/privacy" className="hover:text-gold-light">
+                Privacy Policy
+              </Link>
+              <span aria-hidden="true">·</span>
+              <Link href="/terms" className="hover:text-gold-light">
+                Terms
+              </Link>
+            </p>
           </div>
           <Image
             src={PARTNER_LOGO_SRC}

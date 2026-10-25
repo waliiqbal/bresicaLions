@@ -18,4 +18,7 @@ export interface Player {
   bowlingStyle: string;
   bio: string;
   image?: string;
+  /** Cloudinary id of the photo (not set for demo photos). */
+  imagePublicId?: string;
+  isDemo?: boolean;
 }

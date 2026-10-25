@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { getArticles } from "@/modules/articles/article.service";
 import { getAlbums } from "@/modules/gallery/gallery.service";
-import { getPlayers, getSupportStaff } from "@/modules/players/player.service";
+import { getPlayers } from "@/modules/players/player.service";
+import { getSupportStaff } from "@/modules/staff/staff.service";
 import { SITE_URL } from "@/lib/site";
 
 const pages = [
@@ -13,6 +14,8 @@ const pages = [
   { path: "/news", priority: 0.9 },
   { path: "/gallery", priority: 0.6 },
   { path: "/contact", priority: 0.5 },
+  { path: "/privacy", priority: 0.2 },
+  { path: "/terms", priority: 0.2 },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

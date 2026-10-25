@@ -12,15 +12,15 @@ const items = [
   { label: "Dashboard", href: "/admin", ready: true },
   { label: "Main Banner", href: "/admin/banners", ready: true },
   { label: "News", href: "/admin/news", ready: true },
-  { label: "Matches", href: "/admin/matches", ready: false },
-  { label: "Results", href: "/admin/results", ready: false },
-  { label: "Points Table", href: "/admin/points-table", ready: false },
-  { label: "Squad", href: "/admin/squad", ready: false },
+  { label: "Matches & Results", href: "/admin/matches", ready: true },
+  { label: "Points Table", href: "/admin/points-table", ready: true },
+  { label: "Squad", href: "/admin/squad", ready: true },
   { label: "Gallery", href: "/admin/gallery", ready: true },
-  { label: "Sponsors", href: "/admin/sponsors", ready: false },
-  { label: "About Us", href: "/admin/about", ready: false },
-  { label: "Messages", href: "/admin/messages", ready: false },
-  { label: "Settings", href: "/admin/settings", ready: false },
+  { label: "Sponsors", href: "/admin/sponsors", ready: true },
+  { label: "About Us", href: "/admin/about", ready: true },
+  { label: "Messages", href: "/admin/messages", ready: true },
+  { label: "Subscribers", href: "/admin/subscribers", ready: true },
+  { label: "Settings", href: "/admin/settings", ready: true },
 ];
 
 export function Sidebar({ email }: { email: string }) {

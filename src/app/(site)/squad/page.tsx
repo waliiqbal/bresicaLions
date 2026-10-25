@@ -6,12 +6,9 @@ import { PlayerCard } from "@/components/site/PlayerCard";
 import { Section } from "@/components/site/Section";
 import { ScrollRow } from "@/components/site/ScrollRow";
 import { StaffCard } from "@/components/site/StaffCard";
-import {
-  getPlayers,
-  getSupportStaff,
-  isPlayerRole,
-} from "@/modules/players/player.service";
+import { getPlayers, isPlayerRole } from "@/modules/players/player.service";
 import { PLAYER_ROLES } from "@/modules/players/player.types";
+import { getSupportStaff } from "@/modules/staff/staff.service";
 
 export const metadata: Metadata = {
   title: "Squad",
@@ -65,7 +62,9 @@ export default async function SquadPage({ searchParams }: PageProps<"/squad">) {
           </ul>
         ) : (
           <p className="rounded-xl border border-gold/25 bg-green-dark/60 px-6 py-14 text-center text-cream/70">
-            No players found for this role.
+            {role
+              ? "No players found for this role."
+              : "The squad will be announced soon."}
           </p>
         )}
       </Section>

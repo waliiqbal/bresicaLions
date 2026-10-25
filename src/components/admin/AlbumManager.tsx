@@ -149,6 +149,9 @@ export function AlbumManager({ album }: { album: Album }) {
         <p className="mb-4 text-sm text-ink/60">
           Choose many photos at once. Big photos are resized automatically.
         </p>
+        <p className="mb-4 rounded-lg bg-gold/20 px-3 py-2 text-xs font-semibold text-green-dark">
+          Best size: 1600 × 1200 px (4:3 wide) for every photo. JPG, PNG or WEBP, up to 4 MB each.
+        </p>
         <div
           onDragOver={(e) => {
             e.preventDefault();

@@ -1,31 +1,68 @@
+import { coaching } from "@/data/about";
 import { articles } from "@/data/articles";
 import { banners } from "@/data/banners";
 import { albums } from "@/data/gallery";
+import { players } from "@/data/players";
+import { sponsors } from "@/data/sponsors";
 import { connectDB } from "@/lib/db";
+import { slugify } from "@/lib/utils";
 import { ArticleModel } from "@/modules/articles/article.schema";
 import { BannerModel } from "@/modules/banners/banner.schema";
 import { AlbumModel } from "@/modules/gallery/gallery.schema";
+import { PlayerModel } from "@/modules/players/player.schema";
+import { SponsorModel } from "@/modules/sponsors/sponsor.schema";
+import { StaffModel } from "@/modules/staff/staff.schema";
+import { ensureLionsTeam } from "@/modules/teams/team.service";
 
 /**
  * Demo content lets the website look complete before the club adds its own.
- * Every demo record is flagged `isDemo`, so "Remove demo content" deletes
- * only those and never anything the admin wrote.
+ * Content that is real club material (the crest banner, the MOU photos...) is
+ * saved as normal records. The made-up sponsors, players and coaches are
+ * flagged `isDemo`, so "Remove demo content" deletes only those and never
+ * anything the admin wrote.
  */
 
-export async function countDemoContent() {
+export interface DemoCounts {
+  articles: number;
+  banners: number;
+  albums: number;
+  sponsors: number;
+  players: number;
+  staff: number;
+}
+
+export async function countDemoContent(): Promise<DemoCounts> {
   await connectDB();
-  const [articleCount, bannerCount, albumCount] = await Promise.all([
-    ArticleModel.countDocuments({ isDemo: true }),
-    BannerModel.countDocuments({ isDemo: true }),
-    AlbumModel.countDocuments({ isDemo: true }),
-  ]);
-  return { articles: articleCount, banners: bannerCount, albums: albumCount };
+  const [articleCount, bannerCount, albumCount, sponsorCount, playerCount, staffCount] =
+    await Promise.all([
+      ArticleModel.countDocuments({ isDemo: true }),
+      BannerModel.countDocuments({ isDemo: true }),
+      AlbumModel.countDocuments({ isDemo: true }),
+      SponsorModel.countDocuments({ isDemo: true }),
+      PlayerModel.countDocuments({ isDemo: true }),
+      StaffModel.countDocuments({ isDemo: true }),
+    ]);
+  return {
+    articles: articleCount,
+    banners: bannerCount,
+    albums: albumCount,
+    sponsors: sponsorCount,
+    players: playerCount,
+    staff: staffCount,
+  };
 }
 
 /** Adds the demo content for each section that has nothing in it yet. */
-export async function loadDemoContent() {
+export async function loadDemoContent(): Promise<DemoCounts> {
   await connectDB();
-  const added = { articles: 0, banners: 0, albums: 0 };
+  const added: DemoCounts = {
+    articles: 0,
+    banners: 0,
+    albums: 0,
+    sponsors: 0,
+    players: 0,
+    staff: 0,
+  };
 
   if ((await ArticleModel.estimatedDocumentCount()) === 0) {
     const docs = await ArticleModel.insertMany(
@@ -78,15 +115,77 @@ export async function loadDemoContent() {
     added.albums = docs.length;
   }
 
+  if ((await SponsorModel.estimatedDocumentCount()) === 0) {
+    const docs = await SponsorModel.insertMany(
+      sponsors.map((s) => ({
+        name: s.name,
+        url: "",
+        order: s.order,
+        active: s.active,
+        isDemo: true,
+      })),
+    );
+    added.sponsors = docs.length;
+  }
+
+  if ((await PlayerModel.estimatedDocumentCount()) === 0) {
+    const docs = await PlayerModel.insertMany(
+      players.map((p) => ({
+        name: p.name,
+        slug: p.slug,
+        number: p.number,
+        role: p.role,
+        isCaptain: p.isCaptain,
+        battingStyle: p.battingStyle,
+        bowlingStyle: p.bowlingStyle,
+        bio: p.bio,
+        image: p.image ? { url: p.image } : null,
+        isDemo: true,
+      })),
+    );
+    added.players = docs.length;
+  }
+
+  if ((await StaffModel.estimatedDocumentCount()) === 0) {
+    const docs = await StaffModel.insertMany(
+      coaching.map((member, index) => ({
+        name: member.name,
+        slug: member.slug ?? slugify(member.name),
+        role: member.role,
+        bio: member.bio ?? "",
+        profile: member.profile ?? "",
+        experience: member.experience ?? "",
+        speciality: member.speciality ?? "",
+        image: member.image ? { url: member.image } : null,
+        order: index + 1,
+        isDemo: true,
+      })),
+    );
+    added.staff = docs.length;
+  }
+
+  // The points table always has the Lions row to start from.
+  await ensureLionsTeam();
+
   return added;
 }
 
-export async function removeDemoContent() {
+export async function removeDemoContent(): Promise<DemoCounts> {
   await connectDB();
-  const [a, b, c] = await Promise.all([
+  const [a, b, c, d, e, f] = await Promise.all([
     ArticleModel.deleteMany({ isDemo: true }),
     BannerModel.deleteMany({ isDemo: true }),
     AlbumModel.deleteMany({ isDemo: true }),
+    SponsorModel.deleteMany({ isDemo: true }),
+    PlayerModel.deleteMany({ isDemo: true }),
+    StaffModel.deleteMany({ isDemo: true }),
   ]);
-  return { articles: a.deletedCount, banners: b.deletedCount, albums: c.deletedCount };
+  return {
+    articles: a.deletedCount,
+    banners: b.deletedCount,
+    albums: c.deletedCount,
+    sponsors: d.deletedCount,
+    players: e.deletedCount,
+    staff: f.deletedCount,
+  };
 }

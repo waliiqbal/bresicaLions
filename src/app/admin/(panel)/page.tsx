@@ -5,12 +5,18 @@ import { AdminHeader, Panel } from "@/components/admin/ui";
 import { requireAdminPage } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { isMailConfigured } from "@/lib/mail";
-import { ALLOW_INDEXING } from "@/lib/site";
+import { ALLOW_INDEXING, SITE_URL } from "@/lib/site";
 import { isCloudinaryConfigured } from "@/lib/upload";
 import { countArticles } from "@/modules/articles/article.service";
 import { countBanners } from "@/modules/banners/banner.service";
 import { countAlbums } from "@/modules/gallery/gallery.service";
+import { countMatches } from "@/modules/matches/match.service";
+import { countMessages } from "@/modules/messages/message.service";
+import { countPlayers } from "@/modules/players/player.service";
 import { countDemoContent } from "@/modules/seed/seed.service";
+import { countSponsors } from "@/modules/sponsors/sponsor.service";
+import { countStaff } from "@/modules/staff/staff.service";
+import { countSubscribers } from "@/modules/subscribers/subscriber.service";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -67,31 +73,46 @@ export default async function DashboardPage() {
   const admin = await requireAdminPage();
   const database = await checkDatabase();
 
-  const [articles, banners, gallery, demo] = database.ok
+  const [articles, banners, gallery, matches, players, staff, sponsors, messages, subscribers, demo] = database.ok
     ? await Promise.all([
         countArticles(),
         countBanners(),
         countAlbums(),
+        countMatches(),
+        countPlayers(),
+        countStaff(),
+        countSponsors(),
+        countMessages(),
+        countSubscribers(),
         countDemoContent(),
       ])
     : [
         { published: 0, drafts: 0 },
         { total: 0, active: 0 },
         { albums: 0, photos: 0 },
-        { articles: 0, banners: 0, albums: 0 },
+        { upcoming: 0, results: 0 },
+        0,
+        0,
+        { total: 0, active: 0 },
+        { total: 0, unread: 0 },
+        0,
+        { articles: 0, banners: 0, albums: 0, sponsors: 0, players: 0, staff: 0 },
       ];
 
   const anyEmpty =
     articles.published + articles.drafts === 0 ||
     banners.total === 0 ||
-    gallery.albums === 0;
+    gallery.albums === 0 ||
+    players === 0 ||
+    staff === 0 ||
+    sponsors.total === 0;
 
   return (
     <div className="mx-auto max-w-6xl">
       <AdminHeader
         eyebrow="Dashboard"
         title="Welcome back"
-        description={`Logged in as ${admin.email}. Matches, squad and the other sections appear in the menu as they are added.`}
+        description={`Logged in as ${admin.email}. Use the menu to manage every part of the website.`}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -99,6 +120,11 @@ export default async function DashboardPage() {
         <Stat label="Live banners" value={banners.active} note={`${banners.total} in total`} href="/admin/banners" />
         <Stat label="Photo albums" value={gallery.albums} note="On the gallery page" href="/admin/gallery" />
         <Stat label="Photos" value={gallery.photos} note="Across all albums" href="/admin/gallery" />
+        <Stat label="Upcoming matches" value={matches.upcoming} note={`${matches.results} result${matches.results === 1 ? "" : "s"} entered`} href="/admin/matches" />
+        <Stat label="Players" value={players} note={`${staff} coaching staff`} href="/admin/squad" />
+        <Stat label="Sponsors" value={sponsors.active} note={`${sponsors.total} in total`} href="/admin/sponsors" />
+        <Stat label="Unread messages" value={messages.unread} note={`${messages.total} in total`} href="/admin/messages" />
+        <Stat label="Subscribers" value={subscribers} note="Newsletter list" href="/admin/subscribers" />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
@@ -109,6 +135,11 @@ export default async function DashboardPage() {
             <Row label="Email (OTP codes)" ok={isMailConfigured()} detail={isMailConfigured() ? "Configured" : "Not configured"} />
             <Row label="Image storage" ok={isCloudinaryConfigured()} detail={isCloudinaryConfigured() ? "Cloudinary ready" : "Not configured"} />
             <Row label="Admin account" ok detail={admin.email} />
+            <Row
+              label="Website address"
+              ok={!SITE_URL.includes("localhost")}
+              detail={SITE_URL.includes("localhost") ? "Not set (NEXT_PUBLIC_SITE_URL)" : SITE_URL}
+            />
             <Row label="Search engines" ok detail={ALLOW_INDEXING ? "Site can be indexed" : "Hidden (demo mode)"} />
           </ul>
         </Panel>

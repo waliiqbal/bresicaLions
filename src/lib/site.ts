@@ -34,7 +34,7 @@ export const siteConfig = {
   hashtag: "#OrgoglioDiBrescia",
   contact: {
     address: "Brescia, Lombardia, Italia",
-    email: "info@brescialionst10.com",
+    email: "waliiqbal2020@gmail.com",
   },
   socials,
 };

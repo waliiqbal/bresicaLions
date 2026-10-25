@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { FixturesView } from "@/components/site/FixturesView";
 import {
   getAllMatches,
-  getStandings,
   getUpcomingMatches,
 } from "@/modules/matches/match.service";
+import { getStandings } from "@/modules/teams/team.service";
 
 export const metadata: Metadata = {
   title: "Fixtures",

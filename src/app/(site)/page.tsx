@@ -18,6 +18,9 @@ import { defaultBanner } from "@/modules/banners/default-banner";
 import { getLatestGalleryItems } from "@/modules/gallery/gallery.service";
 import { getUpcomingMatches } from "@/modules/matches/match.service";
 import { getPlayers } from "@/modules/players/player.service";
+import { getSiteSettings } from "@/modules/settings/settings.service";
+import { getSponsors } from "@/modules/sponsors/sponsor.service";
+import { SponsorsRow } from "@/components/site/SponsorsRow";
 import { JsonLd } from "@/components/site/JsonLd";
 import { LOGO_SRC, SITE_URL, siteConfig } from "@/lib/site";
 
@@ -26,7 +29,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const [banners, matches, articles, about, players, gallery] =
+  const [banners, matches, articles, about, players, gallery, sponsors, settings] =
     await Promise.all([
       getActiveBanners(),
       getUpcomingMatches(3),
@@ -34,6 +37,8 @@ export default async function Home() {
       getAbout(),
       getPlayers(),
       getLatestGalleryItems(5),
+      getSponsors(),
+      getSiteSettings(),
     ]);
 
   return (
@@ -49,7 +54,7 @@ export default async function Home() {
           logo: `${SITE_URL}${LOGO_SRC}`,
           location: {
             "@type": "Place",
-            address: siteConfig.contact.address,
+            address: settings.contact.address,
           },
         }}
       />
@@ -117,27 +122,29 @@ export default async function Home() {
         <AboutSection about={about} />
       </Section>
 
-      <Section className="bg-black/20">
-        <SectionHeading
-          white="Meet the"
-          gold="Squad"
-          subtitle="The pride of Brescia"
-        />
-        <ScrollRow>
-          {players.map((player) => (
-            <PlayerCard
-              key={player.id}
-              player={player}
-              className="w-52 shrink-0 snap-start sm:w-60"
-            />
-          ))}
-        </ScrollRow>
-        <div className="mt-6 text-center">
-          <ButtonLink href="/squad" variant="outline">
-            View Full Squad
-          </ButtonLink>
-        </div>
-      </Section>
+      {players.length > 0 && (
+        <Section className="bg-black/20">
+          <SectionHeading
+            white="Meet the"
+            gold="Squad"
+            subtitle="The pride of Brescia"
+          />
+          <ScrollRow>
+            {players.map((player) => (
+              <PlayerCard
+                key={player.id}
+                player={player}
+                className="w-52 shrink-0 snap-start sm:w-60"
+              />
+            ))}
+          </ScrollRow>
+          <div className="mt-6 text-center">
+            <ButtonLink href="/squad" variant="outline">
+              View Full Squad
+            </ButtonLink>
+          </div>
+        </Section>
+      )}
 
       {gallery.length > 0 && (
         <Section>
@@ -156,6 +163,16 @@ export default async function Home() {
       )}
 
       <Section className="bg-black/20">
+        {sponsors.length > 0 && (
+          <div className="mb-14">
+            <SectionHeading
+              white="Our"
+              gold="Sponsors"
+              subtitle="The partners who stand with the Lions"
+            />
+            <SponsorsRow sponsors={sponsors} />
+          </div>
+        )}
         <SectionHeading
           white="Partner with the"
           gold="Lions"

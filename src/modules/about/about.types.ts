@@ -10,21 +10,6 @@ export interface CrestElement {
   text: string;
 }
 
-export interface StaffMember {
-  id: string;
-  /** Used in the profile page address (/squad/staff/<slug>). */
-  slug?: string;
-  name: string;
-  role: string;
-  /** Short line shown on the card. */
-  bio?: string;
-  /** Longer profile text shown on the staff page. */
-  profile?: string;
-  experience?: string;
-  speciality?: string;
-  image?: string;
-}
-
 export interface Owner {
   name: string;
   /** Small gold line above the name. */
@@ -37,7 +22,8 @@ export interface Owner {
   image?: string;
 }
 
-export interface About {
+/** Everything the admin can edit on the About Us page and the home page intro. */
+export interface AboutContent {
   /** Home page intro. */
   heading: string;
   paragraphs: string[];
@@ -53,6 +39,15 @@ export interface About {
   crestElements: CrestElement[];
   mission: string;
   vision: string;
-  management: StaffMember[];
-  coaching: StaffMember[];
+}
+
+/** The three pictures, so the admin form knows which ones are saved uploads. */
+export type AboutImageKey = "image" | "historyImage" | "ownerImage";
+
+export interface AboutForAdmin {
+  content: AboutContent;
+  /** Cloudinary ids of the uploaded pictures (missing = default picture). */
+  publicIds: Partial<Record<AboutImageKey, string>>;
+  /** True once the admin has saved something. */
+  customized: boolean;
 }

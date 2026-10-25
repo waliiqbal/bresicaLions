@@ -132,7 +132,8 @@ export function BannerForm({ banner }: { banner?: Banner }) {
             <ImageDropzone
               folder="banners"
               label="Banner picture"
-              hint="Wide photo, about 1920 x 800. Keep the main subject in the middle or on the right. Without a picture the slide shows the crest."
+              size="1920 × 800 px (very wide)"
+              hint="Keep the main person or subject in the middle or on the right: the sides are cut on phones. Without a picture the slide shows the crest."
               value={image}
               onChange={(value) => {
                 setImage(value);

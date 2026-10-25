@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { StaffMember } from "@/modules/about/about.types";
+import type { StaffMember } from "@/modules/staff/staff.types";
 import { Card } from "@/components/ui/Card";
 
 type StaffCardProps = {
@@ -13,7 +13,7 @@ type StaffCardProps = {
 export function StaffCard({ member, href, priority = false }: StaffCardProps) {
   const card = (
     <Card className="h-full overflow-hidden">
-      <div className="relative aspect-[3/4] bg-linear-to-br from-green-card to-green-deep">
+      <div className="relative aspect-[4/5] bg-linear-to-br from-green-card to-green-deep">
         {member.image ? (
           <Image
             src={member.image}
