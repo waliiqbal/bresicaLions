@@ -38,7 +38,7 @@ const PUBLIC = { published: true };
 const NEWEST = { publishedAt: -1, createdAt: -1 } as const;
 
 /** Home page: published stories, newest first (the one uploaded last comes first). */
-export async function getLatestArticles(limit = 100) {
+export async function getLatestArticles(limit = 50) {
   await connectDB();
   const docs = await ArticleModel.find(PUBLIC)
     .sort(NEWEST)
