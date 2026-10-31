@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { AdminHeader, EmptyState, Notice, StatusPill } from "@/components/admin/ui";
+import { ArticleOrderButtons } from "@/components/admin/ArticleOrderButtons";
 import { DeleteButton } from "@/components/admin/DeleteButton";
 import { ButtonLink } from "@/components/ui/Button";
 import {
@@ -35,6 +36,9 @@ export default async function NewsAdminPage({
   const notice = typeof params.notice === "string" ? notices[params.notice] : undefined;
 
   const articles = await listArticlesForAdmin({ query: q, status });
+  // Moving only makes sense in the full list (a filtered list would hide neighbours).
+  const canReorder = status === "all" && !q;
+  const ids = articles.map((a) => a.id);
 
   const tabHref = (s: ArticleStatusFilter) => {
     const search = new URLSearchParams();
@@ -49,7 +53,7 @@ export default async function NewsAdminPage({
       <AdminHeader
         eyebrow="News"
         title="News & articles"
-        description="Write match reports and announcements. Drafts stay hidden until you publish them."
+        description="Write match reports and announcements. Drafts stay hidden until you publish them. The order below (use ▲ ▼) is the order on the home page and the News page; a new story starts at the top."
         action={
           <ButtonLink href="/admin/news/new" variant="dark">
             + Add new article
@@ -109,11 +113,14 @@ export default async function NewsAdminPage({
         />
       ) : (
         <ul className="space-y-3">
-          {articles.map((article) => (
+          {articles.map((article, index) => (
             <li
               key={article.id}
               className="flex flex-col gap-4 rounded-xl border border-green-dark/15 bg-white p-4 shadow-sm sm:flex-row sm:items-center"
             >
+              {canReorder && (
+                <ArticleOrderButtons ids={ids} index={index} title={article.title} />
+              )}
               <div className="relative h-28 w-full shrink-0 overflow-hidden rounded-lg bg-paper sm:h-16 sm:w-24">
                 {article.image && (
                   <Image src={article.image} alt="" fill sizes="96px" className="object-cover" />

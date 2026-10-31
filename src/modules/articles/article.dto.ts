@@ -33,6 +33,10 @@ const articleFields = z.object({
   featured: z.boolean().optional(),
 });
 
+export const reorderArticlesDto = z.object({
+  ids: z.array(z.string().length(24)).min(1).max(500),
+});
+
 export const createArticleDto = articleFields;
 export const updateArticleDto = articleFields.partial();
 
