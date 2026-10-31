@@ -9,14 +9,8 @@ import { PlayerCard } from "@/components/site/PlayerCard";
 import { Section } from "@/components/site/Section";
 import {
   getPlayerBySlug,
-  getPlayerSlugs,
   getRelatedPlayers,
 } from "@/modules/players/player.service";
-
-export async function generateStaticParams() {
-  const slugs = await getPlayerSlugs();
-  return slugs.map((slug) => ({ slug }));
-}
 
 export async function generateMetadata({
   params,

@@ -6,14 +6,8 @@ import { PhotoGrid } from "@/components/site/PhotoGrid";
 import { Section } from "@/components/site/Section";
 import {
   getAlbumBySlug,
-  getAlbumSlugs,
 } from "@/modules/gallery/gallery.service";
 import { formatDate } from "@/lib/utils";
-
-export async function generateStaticParams() {
-  const slugs = await getAlbumSlugs();
-  return slugs.map((slug) => ({ slug }));
-}
 
 export async function generateMetadata({
   params,

@@ -197,7 +197,7 @@ export function ArticleForm({ article }: { article?: Article }) {
             </Field>
             <Checkbox
               label="Show on homepage"
-              hint="Featured stories are shown first in Latest News."
+              hint="Every published story is already shown on the home page, newest first. This tick is not needed any more."
               checked={featured}
               onChange={(e) => setFeatured(e.target.checked)}
             />

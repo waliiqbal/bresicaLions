@@ -8,14 +8,8 @@ import { Section } from "@/components/site/Section";
 import { StaffCard } from "@/components/site/StaffCard";
 import {
   getStaffBySlug,
-  getStaffSlugs,
   getSupportStaff,
 } from "@/modules/staff/staff.service";
-
-export async function generateStaticParams() {
-  const slugs = await getStaffSlugs();
-  return slugs.map((slug) => ({ slug }));
-}
 
 export async function generateMetadata({
   params,

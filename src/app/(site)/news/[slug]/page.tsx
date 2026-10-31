@@ -9,16 +9,10 @@ import { Section } from "@/components/site/Section";
 import { ShareButtons } from "@/components/site/ShareButtons";
 import {
   getArticleBySlug,
-  getArticleSlugs,
   getRelatedArticles,
 } from "@/modules/articles/article.service";
 import { JsonLd } from "@/components/site/JsonLd";
 import { SITE_URL, siteConfig } from "@/lib/site";
-
-export async function generateStaticParams() {
-  const slugs = await getArticleSlugs();
-  return slugs.map((slug) => ({ slug }));
-}
 
 export async function generateMetadata({
   params,

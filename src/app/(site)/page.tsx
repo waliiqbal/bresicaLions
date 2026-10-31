@@ -33,7 +33,7 @@ export default async function Home() {
     await Promise.all([
       getActiveBanners(),
       getUpcomingMatches(3),
-      getLatestArticles(12),
+      getLatestArticles(),
       getAbout(),
       getPlayers(),
       getLatestGalleryItems(5),

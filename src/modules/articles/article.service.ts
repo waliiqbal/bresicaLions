@@ -34,29 +34,16 @@ export function toArticle(doc: ArticleDoc): Article {
 // ------------------------------------------------------------ public site
 
 const PUBLIC = { published: true };
-const NEWEST = { publishedAt: -1 } as const;
+// Same publish date (it is a date, without time): the story uploaded last comes first.
+const NEWEST = { publishedAt: -1, createdAt: -1 } as const;
 
-/** Home page: stories marked "Show on homepage" first, then the newest. */
-export async function getLatestArticles(limit = 3) {
+/** Home page: published stories, newest first (the one uploaded last comes first). */
+export async function getLatestArticles(limit = 100) {
   await connectDB();
-  const featured = await ArticleModel.find({ ...PUBLIC, featured: true })
+  const docs = await ArticleModel.find(PUBLIC)
     .sort(NEWEST)
     .limit(limit)
     .lean<ArticleDoc[]>();
-
-  let docs = featured;
-  if (featured.length < limit) {
-    const rest = await ArticleModel.find({
-      ...PUBLIC,
-      _id: { $nin: featured.map((a) => a._id) },
-    })
-      .sort(NEWEST)
-      .limit(limit - featured.length)
-      .lean<ArticleDoc[]>();
-    docs = [...featured, ...rest].sort(
-      (a, b) => b.publishedAt.getTime() - a.publishedAt.getTime(),
-    );
-  }
   return docs.map(toArticle);
 }
 
