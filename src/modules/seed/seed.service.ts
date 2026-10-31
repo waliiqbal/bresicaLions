@@ -66,10 +66,7 @@ export async function loadDemoContent(): Promise<DemoCounts> {
 
   if ((await ArticleModel.estimatedDocumentCount()) === 0) {
     const docs = await ArticleModel.insertMany(
-      [...articles]
-        .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
-        .map((a, index) => ({
-        order: index + 1,
+      articles.map((a) => ({
         title: a.title,
         slug: a.slug,
         excerpt: a.excerpt,

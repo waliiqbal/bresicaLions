@@ -34,12 +34,10 @@ export function toArticle(doc: ArticleDoc): Article {
 // ------------------------------------------------------------ public site
 
 const PUBLIC = { published: true };
-// The admin chooses the order (up/down arrows). Stories without a position yet,
-// and stories at the same position, fall back to: newest publish date, then the
-// one uploaded last.
-const NEWEST = { order: 1, publishedAt: -1, createdAt: -1 } as const;
+// Same publish date (it is a date, without time): the story uploaded last comes first.
+const NEWEST = { publishedAt: -1, createdAt: -1 } as const;
 
-/** Home page: every published story, in the order the admin set (new stories start at the top). */
+/** Home page: published stories, newest first (the one uploaded last comes first). */
 export async function getLatestArticles(limit = 100) {
   await connectDB();
   const docs = await ArticleModel.find(PUBLIC)
@@ -123,41 +121,11 @@ export async function getRelatedArticles(article: Article, limit = 3) {
 
 export type ArticleStatusFilter = "all" | "published" | "draft";
 
-/**
- * Gives every story a position the first time the admin needs one (stories saved
- * before ordering existed have none): newest first, as they were shown before.
- */
-async function ensureOrder() {
-  if (!(await ArticleModel.exists({ order: { $exists: false } }))) return;
-  const docs = await ArticleModel.find()
-    .sort({ publishedAt: -1, createdAt: -1 })
-    .select("_id")
-    .lean<{ _id: mongoose.Types.ObjectId }[]>();
-  await ArticleModel.bulkWrite(
-    docs.map((doc, index) => ({
-      updateOne: { filter: { _id: doc._id }, update: { $set: { order: index + 1 } } },
-    })),
-  );
-}
-
-/** `ids` is the new order, first to last (the home page and /news follow it). */
-export async function reorderArticles(ids: string[]) {
-  await connectDB();
-  await ArticleModel.bulkWrite(
-    ids
-      .filter((id) => mongoose.isValidObjectId(id))
-      .map((id, index) => ({
-        updateOne: { filter: { _id: id }, update: { $set: { order: index + 1 } } },
-      })),
-  );
-}
-
 export async function listArticlesForAdmin({
   query,
   status = "all",
 }: { query?: string; status?: ArticleStatusFilter } = {}) {
   await connectDB();
-  await ensureOrder();
   const filter: Record<string, unknown> = {};
   if (status === "published") filter.published = true;
   if (status === "draft") filter.published = false;
@@ -168,7 +136,7 @@ export async function listArticlesForAdmin({
     filter.$or = [{ title: pattern }, { category: pattern }];
   }
   const docs = await ArticleModel.find(filter)
-    .sort(NEWEST)
+    .sort({ createdAt: -1 })
     .lean<ArticleDoc[]>();
   return docs.map(toArticle);
 }
@@ -223,14 +191,9 @@ export async function createArticle(
     slug = await uniqueSlug(input.title, (s) => slugTaken(s), "story");
   }
 
-  // A new story goes to the top of the list; the admin can move it afterwards.
-  await ensureOrder();
-  const first = await ArticleModel.findOne().sort({ order: 1 }).select("order").lean<ArticleDoc>();
-
   const doc = await ArticleModel.create({
     title: input.title,
     slug,
-    order: (first?.order ?? 1) - 1,
     excerpt: input.excerpt,
     content: input.content,
     category: input.category,
